@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="en-us">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Opdracht 2 | Security 4 Portfolio - Hugo Zink &amp; Daniel van Bavel</title>
+
+
+<link rel="stylesheet" href="css/style.css"/></head>
+<body>
+
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href=""><h1 class="title is-4">Security 4 Portfolio - Hugo Zink &amp; Daniel van Bavel</h1></a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"></nav>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="subtitle is-6 is-pulled-right">
+      
+    </div>
+    <h2 class="subtitle is-6">March 7, 2018</h2>
+    <h1 class="title">Opdracht 2</h1>
+    
+    <div class="content">
+      <h2 id="1-sniffing-at-rsa">1.Sniffing at RSA</h2>
+
+<p>Het begin van opdracht 2 begon met een kennismaking over priem getallen. Door een zo hoog mogelijk priem getal te nemen des te kleiner de kans was dat de encryptie te kraken is.
+</p>
+
+<pre><code>----------------------------------------------
+Encryptie
+m       = 289
+E(m)    = 289^3 (mod 319)
+        = 115
+----------------------------------------------
+Decryptie
+c       = 115
+d(c)    = 115^187 (mod 319) = 289
+----------------------------------------------
+</code></pre>
+
+<p>Door het maken van de tweede opdracht kwamen we erachter dat wanneer de m waarde groter is dan de modulo de uitkomst van de encryptie en decryptie niet gelijk is.</p>
+
+<h2 id="2-almost-real-rsa">2.Almost real RSA</h2>
+
+<p>Q: contains a working RSA implementation. Get it running and show that it can be used for 1. confidentiality ad 2. integrity. Appreciate how few lines of code this extremely important algorithm is.</p>
+
+<p>A: The program generates a key pair and using  the public key to encrypt ensures confidentiality and encrypting with the private key ensures with integrity.</p>
+
+<h2 id="3-certificates">3.Certificates</h2>
+
+<h3 id="3-1-what-is-a-certificate-explain-in-your-own-words">3.1 What is a certificate? Explain in your own words.</h3>
+
+<p>Een certificaat is een bewijs voor authenticity.</p>
+
+<h3 id="3-2-what-is-a-self-signed-certificate-explain-in-your-own-words">3.2 What is a self-signed certificate? Explain in your own words.</h3>
+
+<p>Een certificaat die is ondertekend door de partij die het gebruikt.</p>
+
+<h3 id="3-3-creating-your-own-self-signed-certificate">3.3 Creating your own self-signed certificate</h3>
+
+<p>Om ons eigen certificaat te generen hebben we de stappen gevolgd uit de opdracht. We hebben openssl geinstalleerd. Daarna de environment variable aangemaakt. Daarna konden we openssl gebruiken binnen powershell</p>
+
+<h3 id="3-4-create-a-simple-nodejs-server">3.4 Create a simple nodejs server</h3>
+
+<p>Om de nodejs server aan te maken moesten we als eerste stap nodejs installeren. Gelukkig hadden wij allebei dit al gedaan dus konden we deze stap overslaan. Vervolgens zijn de we aangegeven repository uit de opdracht gaan clonen naar onze computer. Nadat de server draaide hebben we de laatste stap gevolgd namelijk de server.js aangepast volgens de link die was toegevoegd in het document.</p>
+
+<h3 id="3-5-verify-using-wireshark">3.5 Verify using wireshark</h3>
+
+<p>Om ook daadwerkelijk te controleren of de verbinding correct was ingesteld en dat confidentiality gegarandeerd is, hebben we via wireshark onze connectie getest.</p>
+
+<p><img src="/images/opdr2/wireshark.png" alt="Wireshark Capture" />
+Zoals hierboven te zien is valt de data niet te onderscheppen, hierdoor weten wij zeker dat confidentiality bewaard blijft.</p>
+
+<h3 id="3-6-install-private-key-and-certificate-in-wireshark">3.6 Install private key and certificate in wireshark</h3>
+
+<p>Als laatste hebben we het certificaat toegevoegd binnen wireshark aan de hand van de hulp linkjes.</p>
+
+<h2 id="4-cryptographic-hash-functions">4.Cryptographic hash functions</h2>
+
+<h3 id="4-1-which-3-properties-are-used-to-define-the-security-level-of-a-cryptographic-hash-function-explain-each-of-these-in-your-own-words">4.1 which 3 properties are used to define the security level of a cryptographic hash function? Explain each of these in your own words.</h3>
+
+<ul>
+<li>Het is makkelijk om een hash uit te rekenen</li>
+<li>Het is extreem moeilijk om een tekst te vinden waar de zelfde hash uitkomt.</li>
+<li>Het is extreem onwaarschijnlijk dat twee net iets verschillende berichten de zelfde hash hebben.</li>
+</ul>
+
+<h3 id="4-2-use-the-openssl-library-to-create-a-hash-using-sha-256">4.2 use the openssl library to create a hash using SHA-256</h3>
+
+<p>In opdracht 4.2 moesten wij een hash generen van een stuk tekst dit hebben wij op de volgende manier gedaan.</p>
+
+<pre><code>echo &quot;Het hele stuk tekst&quot; | .\openssl dgst - sha256
+</code></pre>
+
+<p>De uitkomst daarvan was het onderstaande:</p>
+
+<p><code>128ee56b75d4f1310c429f0407f0629975e534519cfff6bb45999411cb865dec</code> = de hash</p>
+
+<h2 id="5-digital-signature">5.Digital signature</h2>
+
+<h3 id="5-1-change-one-character-of-the-message-and-create-a-sha-256-hash-of-the-same-message-verify-that-the-hashes-are-not-equal-we-can-detect-tampering">5.1 change one character of the message and create a SHA-256 hash of the same message. Verify that the hashes are not equal: we can detect tampering!</h3>
+
+<p>Nu moesten we de tekst van de vorige opdracht gaan veranderen en daarna opnieuw een hash genereren. hieruit moest blijken dat de hash daadwerkelijk was veranderd en dus niet het zelfde was gebleven.
+We hebben nogmaals de opdracht uitgevoerd en een aantal karakters in de tekst veranderd de output was de onderstaande nieuwe hash.</p>
+
+<p><code>9900288a5de676a0945d58ec0ab4030a9c1c69c6b6aa6ac69f0ca629106c0f38</code> = de nieuwe hash</p>
+
+<h4 id="5-1-2-however-this-is-not-sufficient-to-guarantee-integrity-how-do-we-know-that-the-message-is-authentic-meaning-that-it-is-not-tampered-with-but-also-that-it-actually-originates-from-the-lovely-alice-and-not-evil-carol">5.1.2 However, this is not sufficient to guarantee integrity! How do we know that the message is authentic, meaning that it is not tampered with, but also that it actually originates from the lovely Alice and not evil Carol?</h4>
+
+<p>There are two solution to this:</p>
+
+<ul>
+<li>Symmetric digital signature based on a shared secret</li>
+<li>Asymmetric digital signature</li>
+</ul>
+
+<h3 id="5-2-we-re-are-going-to-focus-on-the-asymmetric-digital-signature-recall-from-security-1-how-an-asymmetric-digital-signature-works-and-perform-the-algorithm-manually-using-openssl">5.2 we’re are going to focus on the asymmetric digital signature. Recall from Security 1 how an asymmetric digital signature works and perform the algorithm manually using openssl.</h3>
+
+<p><code>openssl rsautl -sign -in hash.txt -inkey localhost.key -out sig</code></p>
+
+<p><a href="/posts/opdr4">Opdracht 4</a></p>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p></p>
+    
+  </div>
+</section>
+
+</body>
+</html>
+
