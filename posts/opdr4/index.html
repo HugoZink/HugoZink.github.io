@@ -32,14 +32,149 @@
     <h1 class="title">Opdracht 4</h1>
     
     <div class="content">
-      <p>Met de hands-on kennis die wij hebben verkregen uit Opdracht 2, zijn wij begonnen aan Opdracht 4. Deze opdracht ging over cryptocurrency. De opzet was om een fictieve cryptocurrency zelf te gaan implementeren.
+      
+
+<p>Met de hands-on kennis die wij hebben verkregen uit Opdracht 2, zijn wij begonnen aan Opdracht 4. Deze opdracht ging over cryptocurrency. De opzet was om een fictieve cryptocurrency zelf te gaan implementeren.
 Deze currency kreeg de naam &ldquo;Scroogecoin&rdquo;. Het idee is dat er een centrale autoriteit is, genaamd &ldquo;Scrooge&rdquo;. Deze autoriteit krijgt transacties binnen. Onze taak was om de logica van het ontvangen van de transacties
 te gaan implementeren. De transacties zijn georganiseerd in tijdsperiodes, of &ldquo;blokken&rdquo;. Iedere keer wordt er één blok tegelijk afgehandeld.</p>
 
 <p>Wij kregen incomplete code aangeleverd, geschreven in Java. De kern van het verhaal zit in TxHandler.java. Dit bestand was grotendeels gevuld met drie lege functies (waaronder een constructor).
 Wij hebben deze functies aangevuld, aan de hand van de instructies die in de comments van de functie zaten.</p>
 
-<p><a href="/Opdr4ScroogeCoin.zip">De volledige code is hier te vinden.</a> TxHandler.java is voorzien van comments die stap voor stap de code doorlopen.</p>
+<p><a href="/Opdr4ScroogeCoin.zip">De volledige code is hier te vinden.</a> TxHandler.java is voorzien van comments die stap voor stap de code doorlopen. Daarnaast wordt de code hieronder doorlopen.</p>
+
+<h2 id="code">Code</h2>
+
+<h3 id="isvalidtx">isValidTx()</h3>
+
+<p>Het verhaal begint bij de <code>isValidTx</code> methode. Deze methode accepteert een Transaction object, en gaat kijken of deze geldig is. Dit object moet aan 5 eisen voldoen als het geldig wil zijn.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">30</span><span style="color:#a6e22e">public</span> <span style="color:#a6e22e">boolean</span> <span style="color:#a6e22e">isValidTx</span>(<span style="color:#a6e22e">Transaction</span> <span style="color:#a6e22e">tx</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">31</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">32</span>    <span style="color:#75715e">// IMPLEMENT THIS
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">33</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">ArrayList</span>&lt;<span style="color:#a6e22e">UTXO</span>&gt; <span style="color:#a6e22e">seen</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">ArrayList</span>&lt;<span style="color:#a6e22e">UTXO</span>&gt;();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">34</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">35</span>    <span style="color:#a6e22e">double</span> <span style="color:#a6e22e">inputsSum</span> = <span style="color:#ae81ff">0</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">36</span>    <span style="color:#a6e22e">double</span> <span style="color:#a6e22e">outputsSum</span> = <span style="color:#ae81ff">0</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">37</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">38</span>    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">index</span> = <span style="color:#ae81ff">0</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">39</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">40</span>    <span style="color:#66d9ef">for</span>(<span style="color:#a6e22e">Transaction</span>.<span style="color:#a6e22e">Input</span> <span style="color:#a6e22e">in</span>: <span style="color:#a6e22e">tx</span>.<span style="color:#a6e22e">getInputs</span>())
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">41</span>    {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">42</span>        <span style="color:#a6e22e">UTXO</span> <span style="color:#a6e22e">UTXOToCheck</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">UTXO</span>(<span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">prevTxHash</span>, <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">outputIndex</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">43</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">44</span>        <span style="color:#75715e">//Has not been claimed yet (condition 3)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">45</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">seen</span>.<span style="color:#a6e22e">contains</span>(<span style="color:#a6e22e">UTXOToCheck</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">46</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">47</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">48</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">49</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">50</span>        <span style="color:#75715e">//Add input to seen inputs
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">51</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">seen</span>.<span style="color:#a6e22e">add</span>(<span style="color:#a6e22e">UTXOToCheck</span>);</code></pre></div>
+
+<p>De code begint met het doorlopen van alle inputs in de transactie. Bij iedere input wordt er een nieuwe instantie van de UTXO class aangemaakt.</p>
+
+<p>Als eerste wordt er gekeken of deze UTXO al geclaimd is binnen de transactie. Als dit zo is, dan is de transactie ongeldig en wordt er niet verder gekeken.
+Als de transactie nog niet geclaimd is, dan wordt deze toegevoegd aan een tijdelijke lijst van geclaimde transacties. Zo kunnen de volgende Inputs weer vergeleken worden.</p>
+
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">53</span>        <span style="color:#75715e">//Is in UTXO pool (condition 1)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">54</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>(!<span style="color:#a6e22e">uPool</span>.<span style="color:#a6e22e">contains</span>(<span style="color:#a6e22e">UTXOToCheck</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">55</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">56</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">57</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">58</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">59</span>        <span style="color:#a6e22e">inputsSum</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">uPool</span>.<span style="color:#a6e22e">getTxOutput</span>(<span style="color:#a6e22e">UTXOToCheck</span>).<span style="color:#a6e22e">value</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">60</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">61</span>        <span style="color:#75715e">//Has valid signature (condition 2)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">62</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>(!<span style="color:#a6e22e">Crypto</span>.<span style="color:#a6e22e">verifySignature</span>(<span style="color:#a6e22e">uPool</span>.<span style="color:#a6e22e">getTxOutput</span>(<span style="color:#a6e22e">UTXOToCheck</span>).<span style="color:#a6e22e">address</span>, <span style="color:#a6e22e">tx</span>.<span style="color:#a6e22e">getRawDataToSign</span>(<span style="color:#a6e22e">index</span>), <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">signature</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">63</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">64</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">65</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">66</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">67</span>        <span style="color:#a6e22e">index</span><span style="color:#f92672">++</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">68</span>        }</code></pre></div></p>
+
+<p>Vervolgens wordt er gekeken of de huidige UTXO wel in de pool zit. Als dit niet het geval is, dan wordt de transactie afgewezen.</p>
+
+<p>Als de transactie op dit punt nog geldig is, wordt de waarde van de input opgeteld bij de totale waarde van alle inputs. Dit komt later in deze functie nog terug.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">70</span>    <span style="color:#66d9ef">for</span>(<span style="color:#a6e22e">Transaction</span>.<span style="color:#a6e22e">Output</span> <span style="color:#a6e22e">out</span>: <span style="color:#a6e22e">tx</span>.<span style="color:#a6e22e">getOutputs</span>())
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">71</span>    {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">72</span>        <span style="color:#75715e">//Output value is not negative (condition 4)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">73</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">value</span> &lt; <span style="color:#ae81ff">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">74</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">75</span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">76</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">77</span>        <span style="color:#a6e22e">outputsSum</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">value</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">78</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">79</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">80</span>    <span style="color:#75715e">//Sum of inputs is greater than or equal to outputs (condition 5)
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">81</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">outputsSum</span> &gt; <span style="color:#a6e22e">inputsSum</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">82</span>    {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">83</span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">84</span>    }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">85</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">86</span>    <span style="color:#75715e">//If this statement is reached, all 5 conditions are satisfied.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">87</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">88</span>}</code></pre></div>
+
+<p>Nadat alle inputs nagekeken zijn, worden de outputs gecheckt. De waarde van een output mag niet negatief zijn, dus dit wordt eerst gecontroleerd.
+Als deze check slaagt, dan wordt de waarde van de output opgeteld bij de totale waarde van alle outputs.</p>
+
+<p>Tot slot wordt gekeken of de waarde van alle outputs bij elkaar groter is dan die van alle inputs bij elkaar. Als dit het geval is, is de transactie alsnog ongeldig.
+Als deze controle slaagt, dan is er niets mis met de transactie.</p>
+
+<h3 id="handletxs">handleTxs()</h3>
+
+<p>Nu volgt misschien nog wel de belangrijkste functie: <code>handleTxs()</code>. Deze functie is verantwoordelijk voor het afhandelen van een blok van nieuwe transacties.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">95</span><span style="color:#a6e22e">public</span> <span style="color:#a6e22e">Transaction</span>[] <span style="color:#a6e22e">handleTxs</span>(<span style="color:#a6e22e">Transaction</span>[] <span style="color:#a6e22e">possibleTxs</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">96</span>{
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">97</span>    <span style="color:#75715e">// IMPLEMENT THIS
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">98</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">ArrayList</span>&lt;<span style="color:#a6e22e">Transaction</span>&gt; <span style="color:#a6e22e">validTransactions</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">ArrayList</span>&lt;<span style="color:#a6e22e">Transaction</span>&gt;();
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">99</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">100</span>    <span style="color:#66d9ef">for</span>(<span style="color:#a6e22e">Transaction</span> <span style="color:#a6e22e">transaction</span>: <span style="color:#a6e22e">possibleTxs</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">101</span>    {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">102</span>        <span style="color:#75715e">//Skip invalid transactions
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">103</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>(!<span style="color:#a6e22e">this</span>.<span style="color:#a6e22e">isValidTx</span>(<span style="color:#a6e22e">transaction</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">104</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">105</span>            <span style="color:#66d9ef">continue</span>;
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">106</span>        }</code></pre></div>
+
+<p>Er wordt over iedere transactie heen gegaan. Als eerste moet er natuurlijk gekeken worden of deze transactie wel geldig is, via de <code>isValidTx()</code> methode.
+Als deze transactie niet geldig is, dan wordt deze overgeslagen, en gaat het programma direct door met de volgende transactie in de lijst.
+De transactie wordt in dit geval niet toegevoegd aan de lijst van geldige transacties.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">95</span>        <span style="color:#75715e">// Remove old UTXOs from Pool
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">96</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">Transaction</span>.<span style="color:#a6e22e">Input</span> <span style="color:#a6e22e">in</span> : <span style="color:#a6e22e">transaction</span>.<span style="color:#a6e22e">getInputs</span>())
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">97</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">98</span>            <span style="color:#a6e22e">UTXO</span> <span style="color:#a6e22e">oldUTXO</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">UTXO</span>(<span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">prevTxHash</span>, <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">outputIndex</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">99</span>            <span style="color:#a6e22e">uPool</span>.<span style="color:#a6e22e">removeUTXO</span>(<span style="color:#a6e22e">oldUTXO</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">100</span>        }
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">101</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">102</span>        <span style="color:#75715e">// Add new UTXOs to Pool
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">103</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">transaction</span>.<span style="color:#a6e22e">getOutputs</span>().<span style="color:#a6e22e">size</span>(); <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">104</span>        {
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">105</span>            <span style="color:#a6e22e">UTXO</span> <span style="color:#a6e22e">newUTXO</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">UTXO</span>(<span style="color:#a6e22e">transaction</span>.<span style="color:#a6e22e">getHash</span>(), <span style="color:#a6e22e">i</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">106</span>            <span style="color:#a6e22e">uPool</span>.<span style="color:#a6e22e">addUTXO</span>(<span style="color:#a6e22e">newUTXO</span>, <span style="color:#a6e22e">transaction</span>.<span style="color:#a6e22e">getOutputs</span>().<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">i</span>));
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">107</span>        }</code></pre></div>
+
+<p>Dit is de kern van het verhaal. Zoals in de lessen Security besproken is, is een UTXO gebaseerd op een andere UTXO. Dit gaat door middel van een structuur die erg lijkt op een block chain.
+Deze structuur wordt een &ldquo;Merkle Tree&rdquo; genoemd. Het voordeel van deze constructie, is dat het beter schaalbaar is. Je hoeft alleen de huidige keten van transacties af te gaan, om zeker te weten dat er niet is geknoeid
+met de data. Je hoeft niet de gehele chain nogmaals te doorlopen. De complexiteit van deze structuur is <code>O(log n)</code>.</p>
+
+<p>Om deze transactie af te handelen, worden eerst de bijbehorende oude UTXO&rsquo;s uit de pool verwijderd. Daarna worden de nieuwe UTXO&rsquo;s toegevoegd.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">122</span>		<span style="color:#a6e22e">validTransactions</span>.<span style="color:#a6e22e">add</span>(<span style="color:#a6e22e">transaction</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">123</span>	}
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">124</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">125</span>	<span style="color:#75715e">//Convert ArrayList to array and return it.
+</span><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">126</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">Transaction</span>[] <span style="color:#a6e22e">returnArr</span> = <span style="color:#a6e22e">new</span> <span style="color:#a6e22e">Transaction</span>[<span style="color:#a6e22e">validTransactions</span>.<span style="color:#a6e22e">size</span>()];
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">127</span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">validTransactions</span>.<span style="color:#a6e22e">toArray</span>(<span style="color:#a6e22e">returnArr</span>);
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7c7c79">128</span>}</code></pre></div>
+
+<p>Nadat een transactie is afgehandeld, wordt deze toegevoegd aan de lijst van geldige transacties. Tot slot wordt deze lijst omgezet naar een array, en wordt deze gereturnd door de functie.
+In een echte situatie zou deze array gepubliceerd worden als een nieuw blok van geldige transacties.</p>
 
       
     </div>
